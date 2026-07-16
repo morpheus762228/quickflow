@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Build artifacts
+QuickFlow.app/
+*.o
+*.dSYM/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Xcode
+build/
+DerivedData/
+*.xcodeproj/
+
+# node
+node_modules/
+package-lock.json
+
+# Temp/runtime
+*.db
+*.wav
+*.sqlite
+/tmp/

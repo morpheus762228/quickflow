@@ -1,0 +1,17 @@
+# QuickFlow Backend Dependencies
+# Install: pip3 install -r requirements.txt
+
+# Core ASR (choose one)
+openai-whisper>=20231117
+
+# Streaming ASR (optional — install when ready for lower latency)
+# faster-whisper>=1.0.0
+# sounddevice>=0.4.6
+
+# VAD (optional — for streaming mode)
+# torch>=2.0.0
+
+# Local LLM (optional — install when you have a GGUF model)
+# llama-cpp-python>=0.2.0
+
+# No other external deps needed — stdlib only for SQLite, subprocess, etc.
