@@ -7,6 +7,11 @@
 QuickFlow.app/
 *.o
 *.dSYM/
+vendor/
+models/*.bin
+models/*.download
+dist/
+.dmg-stage/
 
 # Python
 __pycache__/

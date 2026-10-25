@@ -1,0 +1,62 @@
+# Changelog
+
+All notable changes to QuickFlow. Dates are release dates.
+
+## 3.0.0 — 2026-10-25
+
+The rewrite. The Python orchestrator is gone; QuickFlow is now one native binary with whisper.cpp compiled in.
+
+**Dictation**
+
+- Global ⌥⌘R / ⌥⌘T shortcuts via Carbon hot keys, with Esc to cancel a take.
+- 16 kHz mono capture from `AVAudioEngine`, transcribed from RAM; audio is never written to disk.
+- Model loaded and warmed up at launch, so the first take does not pay Metal shader compilation.
+- Silence guard discards empty takes instead of pasting a hallucinated sentence.
+- Five-minute cap per take, with an elapsed timer in the panel.
+- Paste via clipboard snapshot + synthetic ⌘V, with the previous clipboard restored afterwards.
+- Clipboard-only fallback when Accessibility is not granted.
+
+**Live subtitles**
+
+- Rolling 12-second re-decode about twice a second, shown in the panel as up to four lines.
+- Timestamp cursor, half-second safety margin, and word-level overlap trimming prevent duplicated words.
+- Preview is discarded on stop; the pasted text always comes from one clean full-take decode.
+- Toggleable from the menu, on by default.
+
+**Formatting**
+
+- Filler and stutter removal, `i` capitalisation, whitespace and punctuation repair.
+- Per-app styles: email, chat, code, prose, chosen from the frontmost app's bundle identifier.
+- Email layout: greeting and sign-off become their own paragraphs.
+- Custom vocabulary passed to whisper as an initial prompt.
+
+**App**
+
+- Menu bar only (`LSUIElement`), no Dock icon.
+- First-run window with in-app Microphone and Accessibility requests; both statuses also live in the menu.
+- Settings: input device, model, language, vocabulary, auto-paste, clipboard preservation, smart formatting, sound cues, launch at login.
+- Last ten transcripts in the menu, with copy and clear.
+- Physical input devices preferred over virtual ones (BlackHole, Loopback).
+- Launch at login through `SMAppService`.
+
+**Distribution**
+
+- Universal binary (arm64 + x86_64), deployment target macOS 13.
+- `build.sh` fetches and statically links whisper.cpp v1.7.6 with Metal and Accelerate.
+- `package.sh` produces `dist/QuickFlow-3.0.dmg` (app, `/Applications` symlink, Read Me) plus `SHA256SUMS`.
+- `small.en` model bundled, so first launch works offline.
+- Ad-hoc signed. Not notarized; first launch needs right-click → Open or `xattr -dr com.apple.quarantine`.
+
+**CLI**
+
+- `--dictate`, `--transcribe` (with `--clean` and `--style`), `--check`, `--devices`, `--help`.
+- Developer render/preview switches: `--live-preview`, `--render-live`, `--render-welcome`.
+- `Scripts/fetch-model.sh` downloads models into `models/`.
+
+**Docs**
+
+- README, usage guide, architecture, build and release guides, troubleshooting, security notes, contributing guide.
+
+## 1.0.0 — superseded
+
+First working version. Swift menu bar shell over a Python `faster-whisper` backend, with the model loaded per invocation and a virtualenv on the user's machine. Dictation worked; startup cost and the process handoff did not survive contact with daily use. Archived under [`legacy/`](legacy/README.md).

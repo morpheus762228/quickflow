@@ -1,117 +1,154 @@
 # QuickFlow
 
-A macOS menu bar app that turns your voice into text — anywhere, instantly.
+**Private, on-device dictation for macOS.** Press ⌥⌘R, talk, press ⌥⌘T. Clean, formatted text lands in whatever app you were using — usually in under a second. No account, no cloud, no audio ever leaving your Mac.
 
-Press **⌥⌘R** to start recording, speak, then press **⌥⌘T** to stop. QuickFlow transcribes your speech with Whisper and pastes the result directly into whatever app you're using.
+Native Swift + [`whisper.cpp`](https://github.com/ggml-org/whisper.cpp) with the Metal backend. No Python, no Electron, no background server, no telemetry.
 
-## Features
+![The QuickFlow panel while dictating, with live subtitles](docs/images/live-subtitles.png)
 
-- **🎙️ Voice-to-Text** — Whisper-powered transcription with automatic paste
-- **🖥️ Context-Aware** — Detects the active app to adapt output style (email, code, message, note)
-- **🧹 Smart Cleanup** — Rule-based filler word removal and punctuation fixing (optional LLM enhancement)
-- **📚 Learns Over Time** — SQLite-backed correction store builds few-shot examples from your edits
-- **⚡ System Utilities** — Quick actions for terminal, finder, screenshots, Wi-Fi, dark mode, clipboard
-- **🔌 Zero External Services** — All local. No cloud API calls, no data leaves your machine.
+## Why this exists
 
-## Requirements
+Built-in dictation is fine for a sentence. It is not built for a paragraph you have to think about: you cannot see what it heard, you cannot feed it your project's vocabulary, and you cannot get the text back once it lands wrong.
 
-- macOS 13.0+
-- Xcode Command Line Tools (`xcode-select --install`)
-- ffmpeg (`brew install ffmpeg`)
-- Python 3.9+ with openai-whisper (`pip3 install --user openai-whisper`)
+QuickFlow is built around three things:
 
-## Quick Start
+- **You can see it working.** The floating panel shows a level meter while you talk and, optionally, the transcript as it grows — so a two-minute take is never a black box.
+- **The text is ready to send.** Filler words and stutters are removed, spoken punctuation is applied, and spacing adapts to whether you are writing an email, chat, prose, or code.
+- **It stays on your Mac.** The model runs locally, the audio is transcribed in memory, and the app contains no networking code.
+
+## Install
+
+1. Download **`QuickFlow-3.0.dmg`** from [Releases](https://github.com/morpheus762228/quickflow/releases).
+2. Open the DMG and drag **QuickFlow** into **Applications**.
+3. Launch it. The app is signed ad-hoc rather than notarized, so macOS will object the first time:
+   - **Right-click QuickFlow → Open → Open**, or
+   - run `xattr -dr com.apple.quarantine /Applications/QuickFlow.app` once.
+
+   On macOS 15 you may also need to allow it in **System Settings → Privacy & Security** after the first blocked attempt.
+4. Approve **Microphone** when the app asks. Approve **Accessibility** so QuickFlow can paste into the frontmost app — without it, transcripts are copied to the clipboard instead.
+
+The `small.en` model ships inside the app, so the first dictation works offline with no download.
+
+Terminal equivalent, if you prefer:
 
 ```bash
-# 1. Clone
-git clone https://github.com/jameslopez/quickflow.git
-cd quickflow
-
-# 2. Install dependencies
-./setup.sh
-
-# 3. Build the app
-./build.sh
-
-# 4. Install to /Applications
-cp -R QuickFlow.app /Applications/
-
-# 5. Launch
+curl -L -o /tmp/QuickFlow.dmg \
+  https://github.com/morpheus762228/quickflow/releases/latest/download/QuickFlow-3.0.dmg
+hdiutil attach /tmp/QuickFlow.dmg -nobrowse
+cp -R /Volumes/QuickFlow/QuickFlow.app /Applications/
+xattr -dr com.apple.quarantine /Applications/QuickFlow.app
+hdiutil detach /Volumes/QuickFlow
 open /Applications/QuickFlow.app
 ```
 
-On first launch, macOS will prompt for:
-- **Microphone access** — required for recording
-- **Accessibility** — required for auto-paste and context detection
-- **Automation** — required for AppleScript interactions
+**Requirements:** macOS 13 Ventura or later, Apple Silicon or Intel, about 1 GB of free disk space. Intel Macs work but transcribe at roughly real time instead of 20–30× real time.
 
-Grant these in **System Settings → Privacy & Security**.
-
-## Usage
+## Use
 
 | Shortcut | Action |
-|----------|--------|
-| **⌥⌘R** | Start recording |
-| **⌥⌘T** | Stop & transcribe — text is pasted into the active app |
+| --- | --- |
+| **⌥⌘R** | Start dictating |
+| **⌥⌘T** | Stop, transcribe, paste |
+| **Esc** | Throw the take away without transcribing |
 
-Click the ⚡ icon in the menu bar for quick actions: terminal, finder, screenshot, lock screen, Wi-Fi toggle, dark mode, and clipboard management.
+Click the menu bar icon for **Start / Finish**, **Copy Last Transcript**, **Recent Transcripts**, **Live Subtitles**, **Settings**, and **About**.
 
-## Architecture
+Speak naturally. Say "period", "comma", "question mark", "new paragraph" and they become punctuation. "Um", "uh", and repeated words are dropped. Greetings and sign-offs in an email get paragraph breaks; code keeps its casing.
+
+![First-run window](docs/images/welcome.png)
+
+### Live subtitles
+
+Turn on **Live Subtitles** (on by default) and the panel shows what whisper heard while you are still talking, growing to four lines and keeping the newest words in view. It re-decodes roughly the last twelve seconds about twice a second, so text settles quickly and never double-prints.
+
+The text you paste is **not** the preview. When you stop, QuickFlow throws the preview away and runs one clean decode over the entire take, so a half-finished word can appear on screen but never in your document.
+
+### Settings
+
+| Setting | What it does |
+| --- | --- |
+| Input | Microphone picker. Virtual devices (BlackHole, Loopback) are skipped when a real mic exists. |
+| Model | Any `ggml-*.bin` in `~/Library/Application Support/QuickFlow/models`. |
+| Language | `en`, `auto`, or a specific language code. |
+| Custom vocabulary | Names, acronyms, and jargon passed to the model as a prompt. This is the single biggest accuracy win for real work. |
+| Paste automatically | Off means transcripts only go to the clipboard. |
+| Keep my clipboard | Restores what you had copied before dictating. |
+| Smart formatting | Filler removal, capitalisation, spoken punctuation, per-app spacing. |
+| Sound cues | Short tone on start and stop. |
+| Launch at login | Keeps QuickFlow ready in the menu bar. |
+
+## Performance
+
+Measured on an M-series Mac with the bundled `small.en` model:
 
 ```
-QuickFlow.app/
-├── Contents/
-│   ├── MacOS/
-│   │   └── QuickFlow          ← Swift menu bar app (native recording + hotkeys)
-│   ├── Resources/
-│   │   ├── backend/           ← Python transcription pipeline
-│   │   │   ├── server.py      ← Orchestrator: ASR + context + cleanup + paste
-│   │   │   ├── asr/           ← Whisper batch + streaming ASR with VAD
-│   │   │   ├── llm/           ← Two-stage LLM pipeline (optional, rule-based fallback)
-│   │   │   ├── context/       ← Screen context injection for accuracy
-│   │   │   ├── learning/      ← Correction learning (SQLite)
-│   │   │   └── budget.py     ← Latency budget with graceful degradation
-│   │   └── requirements.txt
-│   └── Info.plist
+Ready in 0.59s · 12.9s audio in 0.44s (29.1× realtime)
 ```
 
-**Flow:** Swift app records audio natively (AVAudioRecorder) → hands off WAV to Python orchestrator → Whisper transcribes → rule-based cleaner removes filler words → context injector detects app style → text is copied to clipboard and pasted via AppleScript.
+The model is loaded and warmed up at launch, so the first dictation does not pay a Metal shader compilation cost. Recording is 16 kHz mono, capped at five minutes per take, and transcribed from memory — audio is never written to disk by the app.
 
-## Configuration
+## Command line
 
-All config is via environment variables (set before launching the app):
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `QUICKFLOW_ASR_MODEL` | `small` | Whisper model size (tiny/base/small/medium/large) |
-| `QUICKFLOW_LLM_MODEL` | _(empty)_ | Path to GGUF model for LLM-enhanced cleanup |
-| `QUICKFLOW_STREAMING` | `0` | Enable streaming ASR (`1`) |
-| `QUICKFLOW_BUDGET` | `normal` | Latency tier: `fast` / `normal` / `quality` |
-| `QUICKFLOW_STYLE` | `auto` | Output style: `auto` / `default` / `email` / `note` / `code_comment` / `message` |
-| `QUICKFLOW_MIC_INDEX` | _(auto)_ | Override ffmpeg avfoundation mic index |
-
-## Optional: LLM-Enhanced Cleanup
-
-For smarter transcript cleanup (beyond rule-based), install a local LLM:
+The same binary is also a CLI, which makes batch transcription and benchmarking easy:
 
 ```bash
-pip3 install --user llama-cpp-python
+QuickFlow.app/Contents/MacOS/QuickFlow --help
+QuickFlow.app/Contents/MacOS/QuickFlow --check
+QuickFlow.app/Contents/MacOS/QuickFlow --devices
+QuickFlow.app/Contents/MacOS/QuickFlow --transcribe talk.wav --clean --style email
+QuickFlow.app/Contents/MacOS/QuickFlow --dictate
 ```
 
-Then set the model path:
+`--transcribe` writes text to stdout and timing to stderr. `--check` prints permission status, available models, and input devices — the fastest way to diagnose "nothing happened".
+
+## Models
+
+| Model | Size | Notes |
+| --- | --- | --- |
+| `ggml-small.en` | 465 MB | **Bundled.** Best balance of accuracy and speed. |
+| `ggml-base.en` | 141 MB | Faster and lighter; more mistakes on names. |
+| `ggml-large-v3-turbo` | 1.5 GB | Most accurate; wants RAM and a recent Mac. |
+
+Drop any `ggml-*.bin` from [Hugging Face](https://huggingface.co/ggerganov/whisper.cpp) into `~/Library/Application Support/QuickFlow/models/` and pick it in Settings. The app prefers `large-v3-turbo`, then `small.en`, then `base.en` when more than one is installed.
+
+## Build from source
+
 ```bash
-export QUICKFLOW_LLM_MODEL=/path/to/model.gguf
+git clone https://github.com/morpheus762228/quickflow.git
+cd quickflow
+./build.sh              # this Mac's architecture
+./build.sh --universal  # Apple Silicon + Intel
+./package.sh            # dist/QuickFlow-3.0.dmg
 ```
 
-## Optional: Streaming ASR
+`build.sh` compiles whisper.cpp statically with Metal and Accelerate (first run only, ~1 minute per architecture), compiles the Swift sources, assembles `QuickFlow.app`, bundles the best available model, and signs it. Full details, including how to sign with a Developer ID, are in [docs/BUILDING.md](docs/BUILDING.md).
 
-For lower-latency streaming transcription with VAD:
+## Documentation
 
-```bash
-pip3 install --user faster-whisper sounddevice torch
-export QUICKFLOW_STREAMING=1
-```
+| Document | Contents |
+| --- | --- |
+| [docs/USAGE.md](docs/USAGE.md) | Every feature, setting, and shortcut in detail |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How audio, decoding, and live subtitles actually work |
+| [docs/BUILDING.md](docs/BUILDING.md) | Building, packaging, signing, releasing |
+| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Permissions, hotkeys, silence, Gatekeeper |
+| [docs/RELEASING.md](docs/RELEASING.md) | Cutting a release and publishing it |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Build, style, and review expectations |
+| [SECURITY.md](SECURITY.md) | Data handling, network surface, reporting |
+| [ROADMAP.md](ROADMAP.md) | What shipped and what is deliberately not done yet |
+| [CHANGELOG.md](CHANGELOG.md) | Release notes |
+
+## Privacy
+
+- No network calls. The app links no networking framework and has no analytics.
+- Audio exists in RAM for the duration of a take and is discarded after transcription.
+- The model file lives inside the app; nothing is downloaded at runtime.
+- The last ten transcripts are kept locally in `UserDefaults` so you can recover an accidental paste. Clear them from the menu or with `defaults delete com.quickflow.app recentTranscripts`.
+- Clipboard contents are snapshotted and restored around the paste, and never stored.
+
+## Status
+
+Version 3.0. Universal binary, macOS 13+. Ad-hoc signed: there is no Apple Developer ID behind this build, so Gatekeeper requires the one-time right-click or `xattr` step described above. The app has no auto-updater; check Releases for new versions.
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).
