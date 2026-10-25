@@ -1,6 +1,11 @@
 #!/bin/bash
 # Package QuickFlow.app into a distributable DMG.
 #   ./package.sh            -> dist/QuickFlow-<version>.dmg
+#
+# With dmgbuild installed (pip install dmgbuild) the image gets the branded
+# installer window from assets/dmg-background.png: app on the left, an
+# Applications shortcut on the right, and a drag arrow between them.
+# Without dmgbuild it falls back to a plain but still functional image.
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -9,6 +14,8 @@ VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$PROJ
 DIST_DIR="$PROJECT_DIR/dist"
 STAGE_DIR="$PROJECT_DIR/.dmg-stage"
 DMG_PATH="$DIST_DIR/QuickFlow-$VERSION.dmg"
+BACKGROUND="$PROJECT_DIR/assets/dmg-background.png"
+VOLUME_ICON="$PROJECT_DIR/assets/QuickFlow.icns"
 
 if [ ! -d "$APP_DIR" ]; then
   echo "❌ QuickFlow.app not found — run ./build.sh --universal first." >&2
@@ -20,34 +27,30 @@ mkdir -p "$DIST_DIR"
 if [ -d "$STAGE_DIR" ]; then rm -r "$STAGE_DIR"; fi
 mkdir -p "$STAGE_DIR"
 cp -R "$APP_DIR" "$STAGE_DIR/QuickFlow.app"
-ln -s /Applications "$STAGE_DIR/Applications"
 
-cat > "$STAGE_DIR/Read Me.txt" <<EOF
-QuickFlow $VERSION — private, on-device dictation for macOS
-============================================================
-
-1. Drag QuickFlow into your Applications folder.
-
-2. The first time you open it: right-click QuickFlow, choose Open, then Open
-   again. QuickFlow is signed ad-hoc rather than notarized by Apple, so
-   Gatekeeper asks once. On macOS 15 you may also need to allow it under
-   System Settings > Privacy & Security.
-
-   Terminal alternative:
-     xattr -dr com.apple.quarantine /Applications/QuickFlow.app
-
-3. Approve Microphone, and Accessibility so QuickFlow can paste for you.
-
-Press Option-Command-R to start dictating, Option-Command-T to stop.
-Escape cancels a take. The model is included; everything runs on this Mac.
-
-Documentation: https://github.com/morpheus762228/quickflow
-EOF
-
-# Keep the DMG small: strip extended attributes that inflate the image.
+# Keep the image small: strip extended attributes that inflate it. This does
+# not touch the code signature (that lives in Contents/_CodeSignature).
 xattr -cr "$STAGE_DIR/QuickFlow.app" 2>/dev/null || true
 
-hdiutil create -volname "QuickFlow" -srcfolder "$STAGE_DIR" -ov -format UDZO "$DMG_PATH" >/dev/null
+DMGBUILD=()
+if command -v dmgbuild >/dev/null 2>&1; then
+  DMGBUILD=(dmgbuild)
+elif python3 -c "import dmgbuild" >/dev/null 2>&1; then
+  DMGBUILD=(python3 -m dmgbuild)
+fi
+
+if [ ${#DMGBUILD[@]} -gt 0 ] && [ -f "$BACKGROUND" ]; then
+  "${DMGBUILD[@]}" -s "$PROJECT_DIR/Scripts/dmg_settings.py" \
+    -D "stage=$STAGE_DIR" \
+    -D "background=$BACKGROUND" \
+    -D "volume_icon=$VOLUME_ICON" \
+    "QuickFlow" "$DMG_PATH"
+else
+  echo "ℹ️  dmgbuild not found — building a plain image (pip install dmgbuild for the branded window)."
+  ln -s /Applications "$STAGE_DIR/Applications"
+  hdiutil create -volname "QuickFlow" -srcfolder "$STAGE_DIR" -ov -format UDZO "$DMG_PATH" >/dev/null
+fi
+
 rm -r "$STAGE_DIR"
 
 SIZE="$(du -h "$DMG_PATH" | cut -f1 | tr -d ' ')"

@@ -18,28 +18,31 @@ QuickFlow is built around three things:
 
 ## Install
 
-1. Download **`QuickFlow-3.0.dmg`** from [Releases](https://github.com/morpheus762228/quickflow/releases).
-2. Open the DMG and drag **QuickFlow** into **Applications**.
-3. Launch it. The app is signed ad-hoc rather than notarized, so macOS will object the first time:
-   - **Right-click QuickFlow → Open → Open**, or
-   - run `xattr -dr com.apple.quarantine /Applications/QuickFlow.app` once.
+**One file, one drag.** Download **`QuickFlow-3.0.dmg`** (about 450 MB — the model is inside) from [Releases](https://github.com/morpheus762228/quickflow/releases), open it, and drag **QuickFlow** onto **Applications**.
 
-   On macOS 15 you may also need to allow it in **System Settings → Privacy & Security** after the first blocked attempt.
-4. Approve **Microphone** when the app asks. Approve **Accessibility** so QuickFlow can paste into the frontmost app — without it, transcripts are copied to the clipboard instead.
+Then three things, once:
 
-The `small.en` model ships inside the app, so the first dictation works offline with no download.
+1. **First launch** — right-click QuickFlow → **Open** → **Open**. The app is signed ad-hoc rather than notarized, so macOS blocks the first double-click. One-time, expected, not a sign of a bad download. If only *Move to Bin* is offered, allow it under **System Settings → Privacy & Security → Open Anyway**.
+2. **Microphone** — required; nothing can be transcribed without it.
+3. **Accessibility** — lets QuickFlow paste into the frontmost app. Without it the transcript still lands on your clipboard.
 
-Terminal equivalent, if you prefer:
+Step-by-step, including the Gatekeeper fallbacks and how to check the checksum: **[docs/INSTALL.md](docs/INSTALL.md)**.
+
+> The repository is private for now, so the Releases page asks you to be signed in to GitHub. `gh release download v3.0.0 --repo morpheus762228/quickflow --pattern 'QuickFlow-3.0.dmg'` works too.
+
+Prefer the terminal?
 
 ```bash
 curl -L -o /tmp/QuickFlow.dmg \
-  https://github.com/morpheus762228/quickflow/releases/latest/download/QuickFlow-3.0.dmg
+  https://github.com/morpheus762228/quickflow/releases/download/v3.0.0/QuickFlow-3.0.dmg
 hdiutil attach /tmp/QuickFlow.dmg -nobrowse
 cp -R /Volumes/QuickFlow/QuickFlow.app /Applications/
 xattr -dr com.apple.quarantine /Applications/QuickFlow.app
 hdiutil detach /Volumes/QuickFlow
 open /Applications/QuickFlow.app
 ```
+
+(The `curl` line needs the repository to be public, or a GitHub token: `-H "Authorization: token $GH_TOKEN"`.)
 
 **Requirements:** macOS 13 Ventura or later, Apple Silicon or Intel, about 1 GB of free disk space. Intel Macs work but transcribe at roughly real time instead of 20–30× real time.
 
@@ -128,6 +131,7 @@ cd quickflow
 
 | Document | Contents |
 | --- | --- |
+| [docs/INSTALL.md](docs/INSTALL.md) | Download, first launch, permissions, updating, uninstalling |
 | [docs/USAGE.md](docs/USAGE.md) | Every feature, setting, and shortcut in detail |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How audio, decoding, and live subtitles actually work |
 | [docs/BUILDING.md](docs/BUILDING.md) | Building, packaging, signing, releasing |

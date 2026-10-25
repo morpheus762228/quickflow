@@ -2,6 +2,8 @@
 
 QuickFlow lives in the menu bar. There is no main window and no Dock icon: you press a shortcut, talk, press another shortcut, and the text appears where your cursor is.
 
+Installing, Gatekeeper, and the two permission switches are covered in [INSTALL.md](INSTALL.md); this guide assumes QuickFlow is installed and running.
+
 ## First run
 
 On first launch QuickFlow shows a short welcome window with two permission rows:

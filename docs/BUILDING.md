@@ -103,9 +103,28 @@ Notarization needs a paid Apple Developer account; this repository ships ad-hoc 
 ./package.sh
 ```
 
-`package.sh` stages the app with an `/Applications` symlink and a `Read Me.txt`, strips extended attributes (they inflate the image), and writes a compressed `dist/QuickFlow-3.0.dmg`. It also writes `dist/SHA256SUMS`.
+`package.sh` stages the app with an `/Applications` symlink, strips extended attributes (they inflate the image), and writes a compressed `dist/QuickFlow-3.0.dmg` plus `dist/SHA256SUMS`.
 
-The DMG is ~431 MB because it contains the 465 MB `small.en` model compressed. Nothing else is padded in.
+The Finder window people see when they open the DMG — brand background, app on the left, arrow, Applications on the right — comes from [`dmgbuild`](https://github.com/dmgbuild/dmgbuild), a packaging-time Python tool. `package.sh` uses it when the `dmgbuild` executable is on `PATH` and silently falls back to a plain `hdiutil` image without the window dressing when it is not, so builds never fail over it:
+
+```bash
+python3 -m venv .venv-dmg && . .venv-dmg/bin/activate
+pip install dmgbuild
+./package.sh
+```
+
+The window layout is defined in `Scripts/dmg_settings.py` (window rect, icon size, icon positions) and the artwork by `Scripts/make_dmg_background.swift`, which needs nothing beyond the Swift toolchain:
+
+```bash
+swift Scripts/make_dmg_background.swift assets/dmg-background.png 1
+swift Scripts/make_dmg_background.swift assets/dmg-background@2x.png 2
+```
+
+The artwork is sized to the window's **content** area, not its frame: a 600×400 Finder window has a 28 pt title bar, so the image is 600×372 pt (600×372 px at 1×, 1200×744 px at 2×). `dmgbuild` spots the `@2x` sibling and packs both into one HiDPI TIFF, which is what makes the background sharp on Retina displays without scaling the 1× art up.
+
+The three pieces must agree: the arrow drawn at `x: 300, y: 176` sits between the icon slots `(160, 176)` and `(440, 176)` in `dmg_settings.py`, and `ICON_ROW_Y` in the renderer is the same 176. Change one and re-render the other.
+
+The DMG is about 450 MB because it contains the 465 MB `small.en` model compressed. Nothing else is padded in.
 
 ## Project layout
 
@@ -133,7 +152,9 @@ Sources/
 Scripts/
   fetch-model.sh         model downloader
   make_icon.swift        regenerates the icon with AppKit, no dependencies
-assets/                  QuickFlow.icns, PNG sources, older Pillow icon script
+  make_dmg_background.swift  renders the DMG window artwork, also AppKit/SwiftUI only
+  dmg_settings.py        dmgbuild layout: window rect, icon size and positions
+assets/                  QuickFlow.icns, DMG background, PNG sources, older Pillow script
 docs/                    user and developer documentation
 legacy/                  1.0 Python implementation, archived, not built
 vendor/                  whisper.cpp checkout (git-ignored)

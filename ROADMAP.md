@@ -18,7 +18,7 @@ What is shipped, what is still open, and why. Effort is rough calendar/engineeri
 | Clipboard snapshot/restore, recents menu | Pasting does not destroy what you copied; mistakes are recoverable |
 | First-run window with in-app permission prompts | Removes most "nothing happened" support pain |
 | Launch at login (`SMAppService`) | A dictation app you do not have to remember to start |
-| Universal binary, DMG with Read Me, SHA256SUMS | "Download it from GitHub and use it" actually works |
+| Universal binary, drag-to-install DMG window, SHA256SUMS | "Download it from GitHub and use it" actually works |
 | Tagged release with the DMG attached | The promise, delivered |
 | CLI: `--dictate`, `--transcribe`, `--check`, `--devices` | Scriptable, and the way builds get verified without a mic |
 
