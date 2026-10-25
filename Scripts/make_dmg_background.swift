@@ -59,15 +59,19 @@ struct Backdrop: View {
                 .frame(width: 120, height: 18)
                 .position(x: 300, y: ICON_ROW_Y)
 
-            VStack(spacing: 5) {
-                Text("First launch: right-click QuickFlow, choose Open, then Open again.")
-                    .font(.system(size: 11))
+            VStack(spacing: 4) {
+                Text("First launch only: macOS blocks QuickFlow until you allow it.")
+                    .font(.system(size: 10.5))
                     .foregroundColor(faint)
+                Text("System Settings → Privacy & Security → Open Anyway")
+                    .font(.system(size: 10.5, weight: .medium))
+                    .foregroundColor(grey)
                 Text("100% on this Mac  ·  no account  ·  no cloud")
-                    .font(.system(size: 10, weight: .medium))
+                    .font(.system(size: 9.5, weight: .medium))
                     .foregroundColor(faint.opacity(0.85))
             }
-            .position(x: W / 2, y: H - 34)
+            .multilineTextAlignment(.center)
+            .position(x: W / 2, y: H - 42)
         }
         .frame(width: W, height: H)
         .clipped()

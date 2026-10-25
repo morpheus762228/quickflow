@@ -75,7 +75,7 @@ gh release create "v$V" dist/QuickFlow-3.0.dmg dist/SHA256SUMS \
 
 Notes should lead with what changed for the person using it, then the install caveat, then the checksum. Keep the caveat in every release until the app is notarized:
 
-> Ad-hoc signed, not notarized. On first launch, right-click QuickFlow → Open, or run `xattr -dr com.apple.quarantine /Applications/QuickFlow.app`. The DMG is built from this tag; verify it against `SHA256SUMS`.
+> Ad-hoc signed, not notarized. On first launch macOS 15+ requires **System Settings → Privacy & Security → Open Anyway**; on macOS 13–14 right-click → Open. `xattr -dr com.apple.quarantine /Applications/QuickFlow.app` skips both. The DMG is built from this tag; verify it against `SHA256SUMS`.
 
 ## After publishing
 

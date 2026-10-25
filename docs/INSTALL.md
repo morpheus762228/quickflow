@@ -42,22 +42,34 @@ hdiutil detach /Volumes/QuickFlow
 xattr -dr com.apple.quarantine /Applications/QuickFlow.app
 ```
 
-The `xattr` line is the same quarantine override described in step 3 — it saves you the right-click dance.
+The `xattr` line is the same quarantine override described in step 3 — it saves you the Gatekeeper detour.
 
 ## 3. First launch
 
 QuickFlow is signed ad-hoc, not notarized by Apple, so Gatekeeper stops the first double-click. That is expected, and it is a one-time step — the app is not damaged and nothing was mis-downloaded.
 
+### macOS 15 (Sequoia) and later
+
+Newer macOS removed the old right-click → **Open** bypass, so the warning dialog really does offer only *Done* and *Move to Trash*. The way through is in System Settings:
+
+1. In the **"QuickFlow" Not Opened** dialog, click **Done**. Do **not** click *Move to Trash*.
+2. Open **System Settings → Privacy & Security** and scroll all the way to the bottom.
+3. Next to *"QuickFlow" was blocked to protect your Mac* click **Open Anyway**, then authenticate with Touch ID or your password.
+4. Double-click **QuickFlow** in Applications again. The second dialog has an **Open Anyway** button — click it and authenticate once more.
+
+Step 3 only appears for about an hour after a blocked launch, so do it straight away. If you miss the window, just double-click the app again to make it reappear. After this one approval, macOS remembers the decision and the app opens with a normal double-click.
+
+### macOS 13 and 14
+
 **Right-click (or Control-click) QuickFlow in Applications → Open → Open.**
 
-If the only button offered is *Move to Bin*, close the dialog and use one of these instead:
+### Either way, from Terminal
 
-- **System Settings → Privacy & Security**, scroll to the bottom, and click **Open Anyway** next to the message about QuickFlow, or
-- run once in Terminal:
+This removes the download quarantine flag and skips all of the above:
 
-  ```bash
-  xattr -dr com.apple.quarantine /Applications/QuickFlow.app
-  ```
+```bash
+xattr -dr com.apple.quarantine /Applications/QuickFlow.app
+```
 
 Once it launches, the menu bar shows the QuickFlow waveform icon. There is no Dock icon and no main window.
 
@@ -116,7 +128,7 @@ The last two lines matter for a clean reinstall: they drop the permission record
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
-| "QuickFlow is damaged" | Quarantine flag, not damage | Right-click → Open, or `xattr -dr com.apple.quarantine` |
+| "QuickFlow is damaged" / "Not Opened" | Quarantine flag, not damage | **System Settings → Privacy & Security → Open Anyway**, or `xattr -dr com.apple.quarantine` |
 | App opens, no menu bar icon | Launch was blocked silently | Reopen from Applications, check Privacy & Security |
 | Shortcuts do nothing | Accessibility not granted | Grant it, or use the menu bar Start/Finish |
 | Transcript pasted nowhere | Accessibility missing | It was copied to the clipboard — paste it yourself |

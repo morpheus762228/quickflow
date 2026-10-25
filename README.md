@@ -22,7 +22,7 @@ QuickFlow is built around three things:
 
 Then three things, once:
 
-1. **First launch** — right-click QuickFlow → **Open** → **Open**. The app is signed ad-hoc rather than notarized, so macOS blocks the first double-click. One-time, expected, not a sign of a bad download. If only *Move to Bin* is offered, allow it under **System Settings → Privacy & Security → Open Anyway**.
+1. **First launch** — macOS blocks the first double-click, because the app is signed ad-hoc rather than notarized. In the **"QuickFlow" Not Opened** dialog click **Done** (never *Move to Trash*), then open **System Settings → Privacy & Security**, scroll to the bottom, click **Open Anyway** next to *"QuickFlow" was blocked to protect your Mac*, authenticate, and double-click QuickFlow again — the second dialog also has an **Open Anyway** button. On macOS 14 and earlier, right-click → **Open** → **Open** works instead. One time only; a plain double-click works afterwards.
 2. **Microphone** — required; nothing can be transcribed without it.
 3. **Accessibility** — lets QuickFlow paste into the frontmost app. Without it the transcript still lands on your clipboard.
 

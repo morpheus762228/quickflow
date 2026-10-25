@@ -111,7 +111,7 @@ Both are requested in-app at first launch (`requestFirstRunPermissions`) and re-
 
 **The ad-hoc signing caveat.** QuickFlow is signed `-` (ad-hoc), not with a Developer ID. macOS binds TCC grants to the code requirement, which for an ad-hoc signature includes the `cdhash` — and the `cdhash` changes on every build. Rebuilding and replacing the app therefore invalidates both grants, and System Settings may show a toggle that looks on but no longer matches the running binary. The fix is `tccutil reset` plus re-adding the app; the architectural fix is a stable signing identity.
 
-Because there is no Developer ID, there is also no notarization, so a downloaded copy is quarantined and must be opened once via right-click → Open (or `xattr -dr com.apple.quarantine`).
+Because there is no Developer ID, there is also no notarization, so a downloaded copy is quarantined and must be allowed once through **System Settings → Privacy & Security → Open Anyway** (macOS 15+) or right-click → Open (macOS 13–14), or by running `xattr -dr com.apple.quarantine`.
 
 ## Storage
 

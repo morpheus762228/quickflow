@@ -71,7 +71,7 @@ If no model is bundled, the app still builds and runs but asks for a model on fi
 
 Ad-hoc (`-`) is the default and is enough to run locally. Two consequences:
 
-- Gatekeeper blocks the first launch of a downloaded copy until the user right-click-opens it or clears the quarantine attribute.
+- Gatekeeper blocks the first launch of a downloaded copy until the user approves it in System Settings → Privacy & Security → Open Anyway (macOS 15+) or clears the quarantine attribute. The DMG background tells them this, because the dialog itself offers no way through.
 - TCC grants are tied to the `cdhash`, which changes on every build. After replacing the app, reset and re-approve:
 
   ```bash

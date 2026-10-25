@@ -14,14 +14,20 @@ One caveat on `--check`: run from a terminal it inherits the terminal's TCC iden
 
 **"QuickFlow is damaged and should be moved to the Trash"** or **"Apple cannot check it for malicious software"**.
 
-This is Gatekeeper reacting to an unsigned-for-distribution app, not a corrupt download. Either right-click the app → **Open** → **Open**, or:
+This is Gatekeeper reacting to an app that is signed ad-hoc rather than notarized — not a corrupt download. On macOS 15 and later the popup offers no Open button; the approval lives in System Settings:
+
+1. Click **Done** (not *Move to Trash*).
+2. **System Settings → Privacy & Security** → scroll to the bottom → **Open Anyway** next to *"QuickFlow" was blocked to protect your Mac* → authenticate.
+3. Launch QuickFlow again and confirm **Open Anyway** in the second dialog.
+
+The button only stays for about an hour after a blocked launch; trigger the launch again to bring it back. On macOS 13 and 14, right-click → **Open** → **Open** works instead.
+
+The Terminal equivalent, which works on every version:
 
 ```bash
 xattr -dr com.apple.quarantine /Applications/QuickFlow.app
 open /Applications/QuickFlow.app
 ```
-
-On macOS 15, after a blocked launch, also check **System Settings → Privacy & Security** and click **Open Anyway**.
 
 Verify the download first if you like:
 
