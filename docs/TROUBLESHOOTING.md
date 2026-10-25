@@ -61,15 +61,26 @@ cat SHA256SUMS   # from the release
 
 ## Accessibility says off, but System Settings shows it on
 
-The classic ad-hoc signing symptom. macOS stores the grant against the code requirement of the binary that was approved; rebuilding changes the `cdhash`, so the old grant no longer matches and the toggle you see belongs to a stale entry.
+The classic ad-hoc signing symptom. macOS stores the grant against the code requirement of the binary that was approved; rebuilding changes the `cdhash`, so the old grant no longer matches and the toggle you see belongs to a stale entry. The switch reads on, the app still gets denied — because they are two different records.
 
 ```bash
-tccutil reset Accessibility com.quickflow.app
+pkill -x QuickFlow
+tccutil reset Accessibility com.quickflow.app     # reports one line per stale entry removed
+open /Applications/QuickFlow.app
 ```
 
-Then relaunch QuickFlow and approve again. If System Settings lists more than one QuickFlow row, remove the stale ones with **−** and re-add `/Applications/QuickFlow.app` with **+**.
+Approve QuickFlow once the fresh prompt appears. If `tccutil` reported more than one entry, that was the whole problem: every rebuild left another ghost grant behind, and System Settings was showing you one of them rather than the binary in `/Applications`.
 
-The confirmation appears in the system log as `Failed to match existing code requirement … cdhash` when this is the cause.
+Verify the grant actually landed instead of trusting the switch — quit and relaunch QuickFlow (relaunching does not change the signature), then read TCC's own decision:
+
+```bash
+pid=$(pgrep -x QuickFlow)
+log show --last 1m --predicate 'process == "tccd"' --style compact | grep "msgID=${pid}\." | grep AUTHREQ_RESULT
+```
+
+`authValue=2` means allowed; `authValue=1` means the request was denied and the toggle you see is the stale one. If System Settings lists duplicate QuickFlow rows, remove them with **−** and re-add `/Applications/QuickFlow.app` with **+**.
+
+The cause is also visible in the log as `Failed to match existing code requirement … cdhash`. The durable fix is to stop shipping an ad-hoc signature — sign with a Developer ID certificate, or at minimum a self-signed one, so the code requirement identifies the signer rather than each build's cdhash.
 
 ## It pastes into the wrong place
 
