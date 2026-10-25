@@ -29,7 +29,7 @@ There is no update check, no analytics, no crash reporter, no license call, and 
 - **Accessibility** — required only for pasting keystrokes. Without it the transcript still lands on the clipboard.
 - **Nothing else.** No screen recording, no full disk access, no input monitoring beyond the Carbon hot key, no automation entitlements.
 
-Entitlements are in [QuickFlow.entitlements](../QuickFlow.entitlements): a single `com.apple.security.device.audio-input`. App sandbox is off (it needs Accessibility and global hot keys, which are incompatible with the sandbox) and the hardened runtime is enabled at signing time (`flags=adhoc,runtime`).
+Entitlements are in [QuickFlow.entitlements](QuickFlow.entitlements): a single `com.apple.security.device.audio-input`. App sandbox is off (it needs Accessibility and global hot keys, which are incompatible with the sandbox) and the hardened runtime is enabled at signing time (`flags=adhoc,runtime`).
 
 ## Trust boundary
 

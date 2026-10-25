@@ -116,12 +116,13 @@ Drop any `ggml-*.bin` from [Hugging Face](https://huggingface.co/ggerganov/whisp
 ```bash
 git clone https://github.com/morpheus762228/quickflow.git
 cd quickflow
+./Scripts/fetch-model.sh # downloads small.en into models/
 ./build.sh              # this Mac's architecture
 ./build.sh --universal  # Apple Silicon + Intel
-./package.sh            # dist/QuickFlow-3.0.dmg
+./package.sh            # dist/QuickFlow-3.0.dmg + SHA256SUMS
 ```
 
-`build.sh` compiles whisper.cpp statically with Metal and Accelerate (first run only, ~1 minute per architecture), compiles the Swift sources, assembles `QuickFlow.app`, bundles the best available model, and signs it. Full details, including how to sign with a Developer ID, are in [docs/BUILDING.md](docs/BUILDING.md).
+`build.sh` compiles whisper.cpp statically with Metal and Accelerate (first run only, a couple of minutes per architecture), compiles the Swift sources, assembles `QuickFlow.app`, bundles the best available model, and signs it. Full details, including how to sign with a Developer ID, are in [docs/BUILDING.md](docs/BUILDING.md).
 
 ## Documentation
 

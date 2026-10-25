@@ -12,7 +12,7 @@ QuickFlow is a small, single-purpose app: press two shortcuts, get clean text, n
 ## Before you start
 
 - For anything larger than a bug fix, open an issue first. The interesting design decisions here are about latency and text quality, and it is worth agreeing on the approach before you spend an evening on it.
-- Check [ROADMAP.md](../ROADMAP.md) for what is deliberately not built yet.
+- Check [ROADMAP.md](ROADMAP.md) for what is deliberately not built yet.
 
 ## Build and run
 
@@ -22,7 +22,7 @@ QuickFlow is a small, single-purpose app: press two shortcuts, get clean text, n
 open QuickFlow.app
 ```
 
-Full detail, including universal builds and signing, is in [docs/BUILDING.md](BUILDING.md).
+Full detail, including universal builds and signing, is in [docs/BUILDING.md](docs/BUILDING.md).
 
 Note that every rebuild changes the code signature and therefore invalidates Microphone and Accessibility for the new binary. During UI work that does not matter; for end-to-end testing, expect one re-approval per cycle:
 
@@ -77,8 +77,8 @@ Include macOS version, Mac model, selected model, the output of `--check`, and t
 log show --predicate 'process == "QuickFlow"' --last 10m --style compact
 ```
 
-Do not attach audio you would not share publicly. A description of what you said and what came out is usually enough. Security issues: see [SECURITY.md](../SECURITY.md), not a public issue.
+Do not attach audio you would not share publicly. A description of what you said and what came out is usually enough. Security issues: see [SECURITY.md](SECURITY.md), not a public issue.
 
 ## License
 
-By contributing you agree your work is licensed under the MIT license in [LICENSE](../LICENSE).
+By contributing you agree your work is licensed under the MIT license in [LICENSE](LICENSE).

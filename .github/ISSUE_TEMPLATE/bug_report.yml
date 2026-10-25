@@ -1,0 +1,67 @@
+name: Bug report
+description: Something went wrong while dictating
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing, run the built-in check and skim [Troubleshooting](https://github.com/morpheus762228/quickflow/blob/main/docs/TROUBLESHOOTING.md) — permissions and hotkey conflicts account for most reports.
+
+  - type: input
+    id: version
+    attributes:
+      label: QuickFlow version
+      description: Shown on the first line of `--check`, or in About.
+      placeholder: "3.0 (3.0)"
+    validations:
+      required: true
+
+  - type: input
+    id: system
+    attributes:
+      label: macOS and Mac model
+      placeholder: "macOS 15.6.1, MacBook Pro (M1 Pro)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: model
+    attributes:
+      label: Model
+      options:
+        - small.en (bundled)
+        - base.en
+        - medium.en
+        - large-v3-turbo
+        - other / not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you said, what came out, and where you were typing. Do not attach audio you would not share publicly.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Check output and log
+      description: Paste `QuickFlow --check` and the last few minutes of the system log.
+      render: shell
+      placeholder: |
+        $ /Applications/QuickFlow.app/Contents/MacOS/QuickFlow --check
+        QuickFlow Version 3.0 (3.0)
+        ...
+        $ log show --predicate 'process == "QuickFlow"' --last 10m --style compact
+    validations:
+      required: false
