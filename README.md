@@ -18,7 +18,19 @@ QuickFlow is built around three things:
 
 ## Install
 
-**One file, one drag.** Download **`QuickFlow-3.0.dmg`** (about 450 MB — the model is inside) from [Releases](https://github.com/morpheus762228/quickflow/releases), open it, and drag **QuickFlow** onto **Applications**.
+**The easiest way is Homebrew — no Gatekeeper dialog at all:**
+
+```bash
+brew tap morpheus762228/quickflow
+brew trust morpheus762228/quickflow   # Homebrew 6 asks you to trust third-party taps
+brew install --cask quickflow
+```
+
+The cask verifies the checksum, installs into `/Applications`, and clears the
+quarantine attribute, so the first double-click just works. (Requires
+Homebrew 6+.)
+
+**Or one file, one drag.** Download **`QuickFlow-3.0.dmg`** (about 450 MB — the model is inside) from [Releases](https://github.com/morpheus762228/quickflow/releases), open it, and drag **QuickFlow** onto **Applications**.
 
 Then three things, once:
 

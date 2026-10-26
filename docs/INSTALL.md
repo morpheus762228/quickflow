@@ -1,6 +1,6 @@
 # Installing QuickFlow
 
-One file, one drag, two switches. There is no installer package, no account, and nothing else to download — the speech model ships inside the app.
+One file, one drag, two switches — or one Homebrew command. There is no installer package, no account, and nothing else to download — the speech model ships inside the app.
 
 ## Requirements
 
@@ -10,6 +10,22 @@ One file, one drag, two switches. There is no installer package, no account, and
 | Chip | Apple Silicon or Intel — the download is a universal binary |
 | Disk | about 1 GB free (the 465 MB model is inside the app) |
 | Network | only to download the DMG; the app itself never makes a network call |
+
+## 0. Homebrew (recommended)
+
+One command, no Gatekeeper dialog:
+
+```bash
+brew tap morpheus762228/quickflow
+brew trust morpheus762228/quickflow   # Homebrew 6 asks you to trust third-party taps
+brew install --cask quickflow
+```
+
+The cask verifies the SHA-256 checksum, installs into `/Applications`, and
+clears the quarantine attribute, so steps 1–3 below (Gatekeeper and Open
+Anyway) don't apply. You still do step 4 (permissions) and step 5 once.
+
+Requires Homebrew 6 or newer.
 
 ## 1. Download the DMG
 

@@ -1,6 +1,6 @@
 # Releasing
 
-The release artifact is a DMG containing the app and an `/Applications` symlink, presented in a Finder window with the QuickFlow background, the app on the left and Applications on the right. A checksum is published beside it. There is no installer, no pkg, no Homebrew cask to update.
+The release artifact is a DMG containing the app and an `/Applications` symlink, presented in a Finder window with the QuickFlow background, the app on the left and Applications on the right. A checksum is published beside it, and the Homebrew tap [`morpheus762228/homebrew-quickflow`](https://github.com/morpheus762228/homebrew-quickflow) serves a cask that downloads it.
 
 ## Preflight
 
@@ -83,6 +83,7 @@ Notes should lead with what changed for the person using it, then the install ca
 - Compare `shasum -a 256` with `SHA256SUMS` and with the value printed by `package.sh`.
 - Confirm the release notes render, links resolve, and the DMG window still shows the background with both icons on their slots.
 - Announce, if at all, with the caveat about Gatekeeper — a "damaged app" report is the predictable consequence of leaving it out.
+- Update the cask in the [`morpheus762228/homebrew-quickflow`](https://github.com/morpheus762228/homebrew-quickflow) tap: bump `version` to the new tag without the `v` prefix, set `sha256` to the new DMG's digest, commit and push. Homebrew users then get the new build with `brew upgrade --cask quickflow`.
 
 ## If something is wrong
 
